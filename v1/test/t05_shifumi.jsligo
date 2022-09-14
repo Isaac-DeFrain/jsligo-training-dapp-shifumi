@@ -10,7 +10,7 @@ type player = {
 };
 
 // prepare players
-const _:unit = Test.reset_state((3 as nat),(list([]) as list<tez>));
+const _: unit = Test.reset_state(3 as nat, list([]) as list<tez>);
 const alice: player = { address : Test.nth_bootstrap_account(0), secret: 42 as nat };
 const bob: player = { address : Test.nth_bootstrap_account(1), secret: 24 as nat };
 const james: address = Test.nth_bootstrap_account(2);
@@ -142,16 +142,17 @@ const test_alice_conclude = alice_conclude ();
 const test_alice_play_twice = alice_play_twice ();
 const test_alice_play_and_conclude = alice_play_and_conclude ();
 const test_alice_play_bob_play = alice_play_bob_play ();
-const test_alice_play_bob_play_and_conclude = alice_play_bob_play_and_conclude();const test_james_cannot_play = james_cannot_play ();
+const test_alice_play_bob_play_and_conclude = alice_play_bob_play_and_conclude();
+const test_james_cannot_play = james_cannot_play ();
 
 
 const why_this_solution_is_not_a_good_one = () : unit => {
-    const get_contract_address = (storage:Contract.Storage.t) : typed_address<Contract.parameter, Contract.Storage.t> => {
+    const get_contract_address = (storage: Contract.Storage.t) : typed_address<Contract.parameter, Contract.Storage.t> => {
         const originated = Test.originate(Contract.main, storage, 0 as tez);
         return originated[0] as typed_address<Contract.parameter, Contract.Storage.t>;
     };
 
-    const get_contract = (address:typed_address<Contract.parameter, Contract.Storage.t>) : contract<Contract.parameter> => {
+    const get_contract = (address: typed_address<Contract.parameter, Contract.Storage.t>) : contract<Contract.parameter> => {
         return Test.to_contract(address) as contract<Contract.parameter>; 
     };
 
@@ -163,7 +164,6 @@ const why_this_solution_is_not_a_good_one = () : unit => {
     const _ = Test.transfer_to_contract(contract, Play(material), 10 as tez);
 
     Test.log(Test.get_storage(contract_address));
+};
 
-}
-
-// const test_why_this_solution_is_not_a_good_one = why_this_solution_is_not_a_good_one ();
+const test_why_this_solution_is_not_a_good_one = why_this_solution_is_not_a_good_one ();

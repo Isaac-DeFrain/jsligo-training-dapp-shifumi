@@ -5,26 +5,38 @@
 
 export type t = {
     round   : nat,
-    players : [address,address],
+    players : [address, address],
     rounds  : map<nat, Round.t>,
 };
 
-export const fresh_game = (p1:address, p2:address) : t => {
-    failwith("Should provide a a brand new storage");
+export const initial_game = (p1: address, p2: address) : t => {
+    return ({
+        round: 0 as nat,
+        players: [p1, p2],
+        rounds: Map.literal(list([
+            [0 as nat, [RoundValue.waiting, RoundValue.waiting]]
+        ]))
+    });
 };
 
-const new_game = (storage:t) : t => {
-    failwith("Should create a new game");
+const new_game = (storage: t) : t => {
+    return ({ ...storage, round: 0 as nat, rounds: Map.empty as map<nat, Round.t> });
 };
 
-export const get_player = (storage:t, player:address) : option<Player.t> => {
-    failwith("Should return the player corresponding to the given address or nothing");
+export const get_player = (storage: t, player: address) : option<Player.t> => {
+    let res: option<Player.t> = None();
+    switch (player) {
+        case storage.players[0]: res = Some(Player1()); break;
+        case storage.players[1]: res = Some(Player2()); break;
+        default: unit
+    };
+    return(res);
 };
 
 export const get_current_round = (storage: t) : option<Round.t> => {
-    failwith("Should return the current round or nothing");
+    Map.find_opt(storage.round, storage.rounds);
 };
 
-export const update_round = (storage: t, round: Round.t): t => {
-    failwith("Should update the storage");
+export const update_round = (storage: t, round: Round.t) : t => {
+    return({ ...storage, rounds: Map.update(storage.round, Some(round), storage.rounds) });
 };

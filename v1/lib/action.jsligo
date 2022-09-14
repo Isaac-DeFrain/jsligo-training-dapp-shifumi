@@ -1,26 +1,38 @@
 export type t =
-| ["Stone"] 
-| ["Paper"] 
+| ["Stone"]
+| ["Paper"]
 | ["Scissor"];
 
 const stone: t = Stone();
 const paper: t = Paper();
 const scissor: t = Scissor();
 
-const is_stone = (a:t) : bool => {
-    failwith("Predicate checking if the action is stone");
+const is_stone = (a: t) : bool => {
+    match(a, {
+        Stone: () => true,
+        Paper: () => false,
+        Scissor: () => false
+    });
 };
 
-const is_paper = (a:t) : bool => {
-    failwith("Predicate checking if the action is paper");
+const is_paper = (a: t) : bool => {
+    match(a, {
+        Stone: () => false,
+        Paper: () => true,
+        Scissor: () => false
+    });
 };
 
-const is_scissor = (a:t) : bool => {
-    failwith("Predicate checking if the action is scissor");
+const is_scissor = (a: t) : bool => {
+    match(a, {
+        Stone: () => false,
+        Paper: () => false,
+        Scissor: () => true
+    });
 };
 
-export const win_against = (winner: t, looser: t) : bool => {
-    return (is_scissor(winner) && is_paper(looser)) ||
-           (is_paper(winner) && is_stone(looser)) ||
-           (is_stone(winner) && is_scissor(looser));
+export const win_against = (winner: t, loser: t) : bool => {
+    return (is_scissor(winner) && is_paper(loser)) ||
+           (is_paper(winner) && is_stone(loser)) ||
+           (is_stone(winner) && is_scissor(loser));
 }

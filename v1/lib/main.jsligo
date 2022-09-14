@@ -1,27 +1,41 @@
 #import "utils/options.jsligo" "Options"
 #import "errors.jsligo" "Errors"
 #import "action.jsligo" "Action"
+#import "player.jsligo" "Player"
 #import "round_value.jsligo" "RoundValue"
 #import "round.jsligo" "Round"
 #import "storage.jsligo" "Storage"
 
-const play = (storage:Storage.t, player_address:address, action: Action.t) : Storage.t => {
+const play = (storage: Storage.t, player_address: address, action: Action.t) : Storage.t => {
     const round = Options.get_exn(Storage.get_current_round(storage), Errors.invalid_round);
     const player = Options.get_exn(Storage.get_player(storage, player_address), Errors.user_not_allowed_to_play);
 
-    failwith("Should apply the action if possible otherwise fail");
+    if (Round.is_waiting(round, player)) {
+        return Storage.update_round(storage, Round.play(round, player, action));
+    } else {
+        return failwith(Errors.user_not_allowed_to_play);
+    };
 };
 
-const conclude = (storage:Storage.t): [list<operation>, Storage.t] => {
+const conclude = (storage: Storage.t) : [list<operation>, Storage.t] => {
     const round = Options.get_exn(Storage.get_current_round(storage), Errors.invalid_round);
 
-    failwith("Should conclude the current round if possible otherwise fail");
+    let p1 : Player.t = Options.get_exn(Storage.get_player(storage, storage.players[0]), Errors.user_not_allowed_to_play);
+    let p2 : Player.t = Options.get_exn(Storage.get_player(storage, storage.players[1]), Errors.user_not_allowed_to_play);
+    if (Round.is_played(round, p1) && Round.is_played(round, p2)) {
+        return [list([]) as list<operation>, storage];
+    } else {
+        return failwith(Errors.cannot_conclude);
+    };
 };
 
 export type parameter = 
 | ["Play", Action.t] 
 | ["Conclude"];
 
-export const main = (parameter:parameter, storage:Storage.t) : [list<operation>, Storage.t] => {
-    failwith("Apply the action or conclude the game if possible");
+export const main = (parameter: parameter, storage: Storage.t) : [list<operation>, Storage.t] => {
+    match(parameter, {
+        Conclude: () => conclude(storage),
+        Play: a => [list([]) as list<operation>, play(storage, Tezos.get_sender(), a)]
+    });
 };
