@@ -1,34 +1,52 @@
 #import "utils/chest.jsligo" "Chest"
+#import "errors.jsligo" "Errors"
 #import "action.jsligo" "Action"
 
 export type t = 
-| ["Waiting"] 
-| ["Played", Action.t];
+| ["Waiting"]
+| ["Reveal", Action.t]
+| ["Played", chest];
+
+export type decode = (chest: chest) => Action.t;
 
 export const waiting : t = Waiting();
 
-export const is_waiting = (round_value:t) : bool => {
+export const is_waiting = (round_value: t) : bool => {
     return match(round_value, {
         Waiting: () => true,
-        Played: _p => false
-    });
+        Played: __p => false,
+        Reveal: _a => false
+    })
 };
 
-export const is_played = (round_value:t) : bool => {
+export const is_played = (round_value: t) : bool => {
     return match(round_value, {
         Waiting: () => false,
-        Played: _p => true,
-    });
+        Played: __p => true,
+        Reveal: _a => false
+    })
 };
 
-export const is_revealed = (round_value:t) : bool => {
-    failwith("Predicate checking if the round_value is revealed");
+export const is_revealed = (round_value: t) : bool => {
+    return match(round_value, {
+        Waiting: () => false,
+        Played: __p => false,
+        Reveal: _a => true
+    })
 };
 
-export const play = (round_value:t, action:chest) : t => {
-    failwith("Should provide a play action for a given round_value and chest");
+export const play = (round_value: t, chest: chest) : t => {
+    return match(round_value, {
+        Waiting: () => Played(chest),
+        Played: _p => failwith(Errors.user_not_allowed_to_play),
+        Reveal: _a => failwith(Errors.user_not_allowed_to_play)
+    })
 };
 
-export const reveal = (round_value:t, decode: (chest:chest) => Action.t) : t => {
-    failwith("Should provide a reveal action for a given round_value, chest decoder");
+export const reveal = (round_value: t, decode: decode) : t => {
+    return match(round_value, {
+        Waiting: () => failwith(Errors.user_not_allowed_to_reveal),
+        Played: chest => Reveal(decode(chest)),
+        Reveal: _a => failwith(Errors.user_not_allowed_to_reveal)
+    })
 };

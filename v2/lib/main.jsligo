@@ -1,26 +1,48 @@
 #import "utils/options.jsligo" "Options"
+#import "utils/chest.jsligo" "Chest"
 #import "errors.jsligo" "Errors"
-#import "player.jsligo" "Player"
 #import "action.jsligo" "Action"
 #import "round_value.jsligo" "RoundValue"
 #import "round.jsligo" "Round"
 #import "storage.jsligo" "Storage"
 
-const play = (storage:Storage.t, player_address:address, action: Action.t) : Storage.t => {
+const play = (storage: Storage.t, player_address: address, chest: chest) : Storage.t => {
     const round = Options.get_exn(Storage.get_current_round(storage), Errors.invalid_round);
     const player = Options.get_exn(Storage.get_player(storage, player_address), Errors.user_not_allowed_to_play);
 
-    if (RoundValue.is_waiting(Round.get_round_value(round, player))) {
-        return Storage.update_round(storage, Round.play(round, player, action));
+    if (Round.is_waiting(round, player)) {
+        return Storage.update_round(storage, Round.play(round, player, chest));
     } else {
         return failwith(Errors.user_not_allowed_to_play);
     };
 };
 
-const conclude = (storage:Storage.t): Storage.t => {
+const reveal = (storage: Storage.t, player_address: address, decode: RoundValue.decode) : Storage.t => {
     const round = Options.get_exn(Storage.get_current_round(storage), Errors.invalid_round);
+    const p = Options.get_exn(Storage.get_player(storage, player_address), Errors.user_not_allowed_to_play);
+    const p1 = Options.get_exn(Storage.get_player(storage, storage.players[0]), Errors.user_not_allowed_to_play);
+    const p2 = Options.get_exn(Storage.get_player(storage, storage.players[1]), Errors.user_not_allowed_to_play);
 
-    if (Round.is_played(round, Player.player1) && Round.is_played(round, Player.player2)) {
+    // both players have played or revealed
+    if ((Round.is_played(round, p1) || Round.is_revealed(round, p1)) && (Round.is_played(round, p2) || Round.is_revealed(round, p2))) {
+        // check if current player has already revealed
+        if (Round.is_revealed(round, p)) {
+            return failwith(Errors.user_not_allowed_to_reveal);
+        } else {
+            return Storage.update_round(storage, Round.reveal(round, p, decode));
+        }
+    } else {
+        return failwith(Errors.user_not_allowed_to_reveal);
+    }
+};
+
+const conclude = (storage: Storage.t) : Storage.t => {
+    const round = Options.get_exn(Storage.get_current_round(storage), Errors.invalid_round);
+    const p1 = Options.get_exn(Storage.get_player(storage, storage.players[0]), Errors.user_not_allowed_to_play);
+    const p2 = Options.get_exn(Storage.get_player(storage, storage.players[1]), Errors.user_not_allowed_to_play);
+
+    // check that both players have revealed before concluding
+    if (Round.is_revealed(round, p1) && Round.is_revealed(round, p2)) {
         return Storage.new_game(storage);
     } else {
         return failwith(Errors.cannot_conclude);
@@ -28,12 +50,14 @@ const conclude = (storage:Storage.t): Storage.t => {
 };
 
 export type parameter = 
-| ["Play", Action.t] 
+| ["Play", chest]
+| ["Reveal", chest_key, nat]
 | ["Conclude"];
 
-export const main = (parameter:parameter, storage:Storage.t) : [list<operation>, Storage.t] => {
+export const main = (parameter: parameter, storage: Storage.t) : [list<operation>, Storage.t] => {
     match(parameter, {
-        Play    : a  => [list([]), play(storage, Tezos.get_sender(), a)],
-        Conclude: () => [list([]), conclude(storage)]
-    });
+        Play    : chest  => [list([]) as list<operation>, play(storage, Tezos.get_sender(), chest)],
+        Conclude: () => [list([]) as list<operation>, conclude(storage)],
+        Reveal  : r => [list([]) as list<operation>, reveal(storage, Tezos.get_sender(), Chest.decoder(r[0], r[1]) as RoundValue.decode)]
+    })
 };

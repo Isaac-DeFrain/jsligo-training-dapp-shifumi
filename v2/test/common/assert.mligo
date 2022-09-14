@@ -1,3 +1,5 @@
+let failwith (type a b) (a : a) : b = Test.failwith a
+
 let assert_string_failure (res, expected : test_exec_result * string) : unit =
   let expected_internal = Test.eval expected in
   match res with

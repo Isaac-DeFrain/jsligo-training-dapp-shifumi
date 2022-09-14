@@ -4,7 +4,7 @@
 #import "../lib/round_value.jsligo" "RoundValue"
 #import "../lib/round.jsligo" "Round"
  
-const get_play = ([play, secret]: [Action.t, nat]) : chest => {
+const get_play = ([play, secret] : [Action.t, nat]) : chest => {
     const payload = Bytes.pack(play);
     return (Test.create_chest(payload, secret))[0];
 };

@@ -2,28 +2,28 @@
 #import "../lib/action.jsligo" "Action"
 #import "../lib/round_value.jsligo" "RoundValue"
  
-const get_play = ([play, secret]: [Action.t, nat]) : [chest, chest_key] => {
+const get_play = ([play, secret] : [Action.t, nat]) : [chest, chest_key] => {
     const payload = Bytes.pack(play);
     return Test.create_chest(payload, secret);
 };
 
 // ---
 
-const case01 = (): unit => {
+const case01 = () : unit => {
     Check.assert_equal(RoundValue.is_waiting(RoundValue.waiting), true);   
 };
 
-const case02 = (): unit => {
+const case02 = () : unit => {
     Check.assert_equal(RoundValue.is_played(RoundValue.waiting), false); 
 };
 
-const case03 = (): unit => {
+const case03 = () : unit => {
     Check.assert_equal(RoundValue.is_revealed(RoundValue.waiting), false); 
 };
 
 // ---
 
-const case04 = (): unit => {
+const case04 = () : unit => {
     // Given 
     const played = get_play(Action.scissor, 42 as nat);
     const round_value = RoundValue.waiting;
@@ -35,7 +35,7 @@ const case04 = (): unit => {
     Check.assert_equal(RoundValue.is_played(new_round_value), true);   
 };
 
-const case05 = (): unit => {
+const case05 = () : unit => {
     // Given 
     const played = get_play(Action.scissor, 42 as nat);
     const round_value = RoundValue.waiting;

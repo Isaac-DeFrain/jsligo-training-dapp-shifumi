@@ -16,13 +16,13 @@ const get_contract = (storage:Contract.Storage.t) : contract<Contract.parameter>
 };
 
 // prepare players
-const _:unit = Test.reset_state((3 as nat),(list([6000 as tez,6000 as tez,6000 as tez]) as list<tez>));
+const _: unit = Test.reset_state((3 as nat),(list([6000 as tez,6000 as tez,6000 as tez]) as list<tez>));
 const alice: player = { address : Test.nth_bootstrap_account(0), secret: 42 as nat };
 const bob: player = { address : Test.nth_bootstrap_account(1), secret: 24 as nat };
 const james: address = Test.nth_bootstrap_account(2);
 
 // Shifumi turn
-const get_play = ([play, secret]: [Contract.Storage.Action.t, nat]) : [chest, chest_key] => {
+const get_play = ([play, secret] : [Contract.Storage.Action.t, nat]) : [chest, chest_key] => {
     const payload = Bytes.pack(play);
     return Test.create_chest(payload, secret);
 };
