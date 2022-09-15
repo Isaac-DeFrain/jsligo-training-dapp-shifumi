@@ -4,7 +4,7 @@
 
 export type t = 
 | ["Waiting"]
-| ["Reveal", Action.t]
+| ["Revealed", Action.t]
 | ["Played", chest];
 
 export type decode = (chest: chest) => Action.t;
@@ -15,7 +15,7 @@ export const is_waiting = (round_value: t) : bool => {
     return match(round_value, {
         Waiting: () => true,
         Played: __p => false,
-        Reveal: _a => false
+        Revealed: _a => false
     })
 };
 
@@ -23,7 +23,7 @@ export const is_played = (round_value: t) : bool => {
     return match(round_value, {
         Waiting: () => false,
         Played: __p => true,
-        Reveal: _a => false
+        Revealed: _a => false
     })
 };
 
@@ -31,7 +31,7 @@ export const is_revealed = (round_value: t) : bool => {
     return match(round_value, {
         Waiting: () => false,
         Played: __p => false,
-        Reveal: _a => true
+        Revealed: _a => true
     })
 };
 
@@ -39,14 +39,14 @@ export const play = (round_value: t, chest: chest) : t => {
     return match(round_value, {
         Waiting: () => Played(chest),
         Played: _p => failwith(Errors.user_not_allowed_to_play),
-        Reveal: _a => failwith(Errors.user_not_allowed_to_play)
+        Revealed: _a => failwith(Errors.user_not_allowed_to_play)
     })
 };
 
 export const reveal = (round_value: t, decode: decode) : t => {
     return match(round_value, {
         Waiting: () => failwith(Errors.user_not_allowed_to_reveal),
-        Played: chest => Reveal(decode(chest)),
-        Reveal: _a => failwith(Errors.user_not_allowed_to_reveal)
+        Played: chest => Revealed(decode(chest)),
+        Revealed: _a => failwith(Errors.user_not_allowed_to_reveal)
     })
 };

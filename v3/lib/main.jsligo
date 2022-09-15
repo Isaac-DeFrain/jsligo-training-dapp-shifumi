@@ -77,7 +77,7 @@ export const conclude = (storage: Storage.t) : [list<operation>, Storage.t] => {
 
     if (Round.is_revealed(round, p1) && Round.is_revealed(round, p2)) {
         return match(decide(storage, actions.player1[0], actions.player2[0]), {
-            // tie => refunds
+            // tie => refund each player
             None: () => [
                 list([
                     Tezos.transaction(unit, actions.player1[1], get_contract(Storage.get_address(storage, Player.player1))),
@@ -85,6 +85,7 @@ export const conclude = (storage: Storage.t) : [list<operation>, Storage.t] => {
                 ]),
                 Storage.new_game(storage)
             ],
+            // winning address takes all
             Some: address => {
                 let amount: tez = actions.player1[1] + actions.player2[1];
                 [ list([Tezos.transaction(unit, amount, get_contract(address))]), Storage.new_game(storage) ]

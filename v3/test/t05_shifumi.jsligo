@@ -1,5 +1,6 @@
 #import "common/assert.mligo" "Assert"
 #import "../lib/errors.jsligo" "Errors"
+#import "../lib/utils/options.jsligo" "Options"
 #import "../lib/action.jsligo" "Action"
 #import "../lib/main.jsligo" "Contract"
 
@@ -248,6 +249,8 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_bob_win = () : string => {
     return "Success";
 };
 
+const get_tez = (opt: option<tez>) : tez => Options.get_exn(opt, "fail");
+
 const alice_play_bob_play_alice_reveal_bob_reveal_and_bob_win_the_prize = () : string => {
     // prepare players
     const _ : unit = reset_state(unit);
@@ -261,7 +264,7 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_bob_win_the_prize = () : s
     let balance_alice0: tez = Test.get_balance(alice.address);
     let balance_bob0: tez = Test.get_balance(bob.address);
     Test.log("----------");
-    Test.log("og");
+    Test.log("----og----");
     Test.log("----------");
     Test.log(["James", balance_james0]);
     Test.log(["Alice", balance_alice0]);
@@ -278,9 +281,9 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_bob_win_the_prize = () : s
     Test.log(["Alice", balance_alice1]);
     Test.log(["Bob  ", balance_bob1]);
     Test.log("----------");
-    Test.log(["James diff", balance_james1 - balance_james0]);
-    Test.log(["Alice diff", balance_alice1 - balance_alice0]);
-    Test.log(["Bob: -diff", balance_bob0 - balance_bob1, "why does bob lose tez?"]); // TODO
+    Test.log(["James gain", get_tez(balance_james1 - balance_james0)]);
+    Test.log(["Alice gain", get_tez(balance_alice1 - balance_alice0)]);
+    Test.log(["Bob:  loss", get_tez(balance_bob0 - balance_bob1), "why does bob lose tez?"]); // TODO
     Test.log("----------");
 
     // Alice plays Paper
@@ -297,9 +300,9 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_bob_win_the_prize = () : s
     Test.log(["Alice", balance_alice2]);
     Test.log(["Bob  ", balance_bob2]);
     Test.log("----------");
-    Test.log(["James diff", balance_james2 - balance_james1]);
-    Test.log(["Alice-diff", balance_alice1 - balance_alice2]);
-    Test.log(["Bob   diff", balance_bob2 - balance_bob1]);
+    Test.log(["James gain", get_tez(balance_james2 - balance_james1)]);
+    Test.log(["Alice loss", get_tez(balance_alice1 - balance_alice2)]);
+    Test.log(["Bob   gain", get_tez(balance_bob2 - balance_bob1)]);
     Test.log("----------");
 
     // Bob plays Scissor
@@ -316,9 +319,9 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_bob_win_the_prize = () : s
     Test.log(["Alice", balance_alice3]);
     Test.log(["Bob  ", balance_bob3]);
     Test.log("----------");
-    Test.log(["James diff", balance_james3 - balance_james2]);
-    Test.log(["Alice diff", balance_alice3 - balance_alice2]);
-    Test.log(["Bob: -diff", balance_bob2 - balance_bob3]);
+    Test.log(["James gain", get_tez(balance_james3 - balance_james2)]);
+    Test.log(["Alice gain", get_tez(balance_alice3 - balance_alice2)]);
+    Test.log(["Bob:  loss", get_tez(balance_bob2 - balance_bob3)]);
     Test.log("----------");
 
     // Alice reveals
@@ -334,9 +337,9 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_bob_win_the_prize = () : s
     Test.log(["Alice", balance_alice4]);
     Test.log(["Bob  ", balance_bob4]);
     Test.log("----------");
-    Test.log(["James diff", balance_james4 - balance_james3]);
-    Test.log(["Alice-diff", balance_alice3 - balance_alice4]);
-    Test.log(["Bob   diff", balance_bob4 - balance_bob3]);
+    Test.log(["James gain", get_tez(balance_james4 - balance_james3)]);
+    Test.log(["Alice loss", get_tez(balance_alice3 - balance_alice4)]);
+    Test.log(["Bob   gain", get_tez(balance_bob4 - balance_bob3)]);
     Test.log("----------");
 
     // Bob reveals
@@ -352,9 +355,9 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_bob_win_the_prize = () : s
     Test.log(["Alice", balance_alice5]);
     Test.log(["Bob  ", balance_bob5]);
     Test.log("----------");
-    Test.log(["James diff", balance_james5 - balance_james4]);
-    Test.log(["Alice diff", balance_alice5 - balance_alice4]);
-    Test.log(["Bob: -diff", balance_bob4 - balance_bob5]);
+    Test.log(["James gain", get_tez(balance_james5 - balance_james4)]);
+    Test.log(["Alice gain", get_tez(balance_alice5 - balance_alice4)]);
+    Test.log(["Bob   loss", get_tez(balance_bob4 - balance_bob5)]);
     Test.log("----------");
 
     // When
@@ -372,17 +375,18 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_bob_win_the_prize = () : s
     Test.log(["Alice", balance_alice6]);
     Test.log(["Bob  ", balance_bob6]);
     Test.log("----------");
-    Test.log(["James diff", balance_james6 - balance_james5]);
-    Test.log(["Alice diff", balance_alice6 - balance_alice5]);
-    Test.log(["Bob   diff", balance_bob6 - balance_bob5]);
+    Test.log(["James gain", get_tez(balance_james6 - balance_james5)]);
+    Test.log(["Alice gain", get_tez(balance_alice6 - balance_alice5)]);
+    Test.log(["Bob   gain", get_tez(balance_bob6 - balance_bob5)]);
     Test.log("----------");
-    Test.log("total");
+    Test.log("---total--");
     Test.log("----------");
-    Test.log(["James total diff", balance_james6 - balance_james0]);
-    Test.log(["Alice total-diff", balance_alice0 - balance_alice6]);
-    Test.log(["Bob   total-diff", balance_bob6 - balance_bob0]);
+    Test.log(["James total gain", get_tez(balance_james6 - balance_james0)]);
+    Test.log(["Alice total loss", get_tez(balance_alice0 - balance_alice6)]);
+    Test.log(["Bob   total gain", get_tez(balance_bob6 - balance_bob0)]);
     Test.log("----------");
 
+    // Bob wins the pot
     assert(balance_bob6 == balance_bob5 + alice.pay + bob.pay);
     assert(balance_alice6 == balance_alice5);
 
@@ -398,23 +402,105 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_nobody_win_the_prize = () 
 
     // Given
     Test.set_baker(james);
+    let balance_james0: tez = Test.get_balance(james);
+    let balance_alice0: tez = Test.get_balance(alice.address);
+    let balance_bob0: tez = Test.get_balance(bob.address);
+    Test.log("----------");
+    Test.log("----og----");
+    Test.log("----------");
+    Test.log(["James", balance_james0]);
+    Test.log(["Alice", balance_alice0]);
+    Test.log(["Bob  ", balance_bob0]);
+    Test.log("----------");
     const contract = get_contract(Contract.Storage.initial_game(alice.address, bob.address));  
 
+    let balance_james1: tez = Test.get_balance(james);
+    let balance_alice1: tez = Test.get_balance(alice.address);
+    let balance_bob1: tez = Test.get_balance(bob.address);
+    Test.log("game initialized");
+    Test.log("----------");
+    Test.log(["James", balance_james1]);
+    Test.log(["Alice", balance_alice1]);
+    Test.log(["Bob  ", balance_bob1]);
+    Test.log("----------");
+    Test.log(["James gain", get_tez(balance_james1 - balance_james0)]);
+    Test.log(["Alice gain", get_tez(balance_alice1 - balance_alice0)]);
+    Test.log(["Bob   loss", get_tez(balance_bob0 - balance_bob1), "why does bob lose tez?"]); // TODO
+    Test.log("----------");
+
+    // Alice plays Paper
     Test.set_source(alice.address);
     const material_alice = get_play(Action.paper, alice.secret);
     const _ = Test.transfer_to_contract(contract, Play(material_alice[0]), alice.pay);
 
+    let balance_james2: tez = Test.get_balance(james);
+    let balance_alice2: tez = Test.get_balance(alice.address);
+    let balance_bob2: tez = Test.get_balance(bob.address);
+    Test.log("Alice plays Paper");
+    Test.log("----------");
+    Test.log(["James", balance_james2]);
+    Test.log(["Alice", balance_alice2]);
+    Test.log(["Bob  ", balance_bob2]);
+    Test.log("----------");
+    Test.log(["James gain", get_tez(balance_james2 - balance_james1)]);
+    Test.log(["Alice loss", get_tez(balance_alice1 - balance_alice2)]);
+    Test.log(["Bob   gain", get_tez(balance_bob2 - balance_bob1)]);
+    Test.log("----------");
+
+    // Bob also plays Paper
     Test.set_source(bob.address);
     const material_bob = get_play(Action.paper, bob.secret);
     const _ = Test.transfer_to_contract(contract, Play(material_bob[0]), bob.pay);
 
+    let balance_james3: tez = Test.get_balance(james);
+    let balance_alice3: tez = Test.get_balance(alice.address);
+    let balance_bob3: tez = Test.get_balance(bob.address);
+    Test.log("Bob plays Scissor");
+    Test.log("----------");
+    Test.log(["James", balance_james3]);
+    Test.log(["Alice", balance_alice3]);
+    Test.log(["Bob  ", balance_bob3]);
+    Test.log("----------");
+    Test.log(["James gain", get_tez(balance_james3 - balance_james2)]);
+    Test.log(["Alice gain", get_tez(balance_alice3 - balance_alice2)]);
+    Test.log(["Bob   loss", get_tez(balance_bob2 - balance_bob3)]);
+    Test.log("----------");
+
+    // Alice reveals
     Test.set_source(alice.address);
     const _ = Test.transfer_to_contract(contract, Reveal([material_alice[1], alice.secret]), 0 as tez);
+
+    let balance_james4: tez = Test.get_balance(james);
+    let balance_alice4: tez = Test.get_balance(alice.address);
+    let balance_bob4: tez = Test.get_balance(bob.address);
+    Test.log("Alice reveals");
+    Test.log("----------");
+    Test.log(["James", balance_james4]);
+    Test.log(["Alice", balance_alice4]);
+    Test.log(["Bob  ", balance_bob4]);
+    Test.log("----------");
+    Test.log(["James gain", get_tez(balance_james4 - balance_james3)]);
+    Test.log(["Alice loss", get_tez(balance_alice3 - balance_alice4)]);
+    Test.log(["Bob   gain", get_tez(balance_bob4 - balance_bob3)]);
+    Test.log("----------");
+
+    // Bob reveals
+    Test.set_source(bob.address);
     const _ = Test.transfer_to_contract(contract, Reveal([material_bob[1], bob.secret]), 0 as tez);
 
-    // get balances after play, before conclusion
-    const bob_balance = Test.get_balance (bob.address);
-    const alice_balance = Test.get_balance (alice.address);
+    let balance_james5: tez = Test.get_balance(james);
+    let balance_alice5: tez = Test.get_balance(alice.address);
+    let balance_bob5: tez = Test.get_balance(bob.address);
+    Test.log("Bob reveals");
+    Test.log("----------");
+    Test.log(["James", balance_james5]);
+    Test.log(["Alice", balance_alice5]);
+    Test.log(["Bob  ", balance_bob5]);
+    Test.log("----------");
+    Test.log(["James gain", get_tez(balance_james5 - balance_james4)]);
+    Test.log(["Alice gain", get_tez(balance_alice5 - balance_alice4)]);
+    Test.log(["Bob   loss", get_tez(balance_bob4 - balance_bob5)]);
+    Test.log("----------");
 
     // When
     Test.set_source(james);
@@ -422,9 +508,29 @@ const alice_play_bob_play_alice_reveal_bob_reveal_and_nobody_win_the_prize = () 
     Test.bake_until_n_cycle_end(1 as nat);
 
     // Then
-    // both played Paper so no one wins
-    assert(Test.get_balance(bob.address) == bob_balance);
-    assert(Test.get_balance(alice.address) == alice_balance);
+    let balance_james6: tez = Test.get_balance(james);
+    let balance_alice6: tez = Test.get_balance(alice.address);
+    let balance_bob6: tez = Test.get_balance(bob.address);
+    Test.log("game concludes - Bob wins!");
+    Test.log("----------");
+    Test.log(["James", balance_james6]);
+    Test.log(["Alice", balance_alice6]);
+    Test.log(["Bob  ", balance_bob6]);
+    Test.log("----------");
+    Test.log(["James gain", get_tez(balance_james6 - balance_james5)]);
+    Test.log(["Alice gain", get_tez(balance_alice6 - balance_alice5)]);
+    Test.log(["Bob   gain", get_tez(balance_bob6 - balance_bob5)]);
+    Test.log("----------");
+    Test.log("---total--");
+    Test.log("----------");
+    Test.log(["James total gain", get_tez(balance_james6 - balance_james0)]);
+    Test.log(["Alice total loss", get_tez(balance_alice0 - balance_alice6)]);
+    Test.log(["Bob   total loss", get_tez(balance_bob0 - balance_bob6)]);
+    Test.log("----------");
+
+    // both played Paper, no one wins so they each get their bets back
+    assert(balance_bob6 == balance_bob5 + bob.pay);
+    assert(balance_alice6 == balance_alice5 + alice.pay);
 
     return "Success";
 };
