@@ -1,3 +1,7 @@
+#import "../action.jsligo" "Action"
+
+export type decoder = (chest: chest) => Action.t;
+
 const failed_to_open_chest : string = "Failed to open chest";
 const failed_to_unpack_payload : string = "Failed to unpack the payload";
 

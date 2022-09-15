@@ -62,12 +62,13 @@ const case06 = (): unit => {
 // ---
 
 const case07 = (): unit => {
-    // Given 
+    // Given
+    // - Player1 has played Scissor at 1 tez
     const played : [chest, chest_key] = get_play(Action.scissor, 42 as nat);
     const round_value : RoundValue.t = RoundValue.play(RoundValue.waiting, played[0], 1 as tez);
 
     // When
-    const new_round_value : RoundValue.t = RoundValue.reveal(round_value, (chest:chest) => Action.scissor);
+    const new_round_value : RoundValue.t = RoundValue.reveal(round_value, (_ : chest) => Action.scissor);
 
     // Then
     Check.assert_equal(RoundValue.is_revealed(new_round_value), true);   
@@ -79,7 +80,7 @@ const case08 = (): unit => {
     const round_value : RoundValue.t = RoundValue.play(RoundValue.waiting, played[0], 1 as tez);
 
     // When
-    const new_round_value : RoundValue.t = RoundValue.reveal(round_value, (chest:chest) => Action.scissor);
+    const new_round_value : RoundValue.t = RoundValue.reveal(round_value, (_ : chest) => Action.scissor);
 
     // Then
     Check.assert_equal(RoundValue.is_waiting(new_round_value), false);   
@@ -91,7 +92,7 @@ const case09 = (): unit => {
     const round_value : RoundValue.t = RoundValue.play(RoundValue.waiting, played[0], 1 as tez);
 
     // When
-    const new_round_value : RoundValue.t = RoundValue.reveal(round_value, (chest:chest) => Action.scissor);
+    const new_round_value : RoundValue.t = RoundValue.reveal(round_value, (_ : chest) => Action.scissor);
 
     // Then
     Check.assert_equal(RoundValue.is_played(new_round_value), false);   
